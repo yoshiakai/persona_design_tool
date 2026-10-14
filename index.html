@@ -43,7 +43,7 @@
                 思考の足場をつくり、ペルソナと画像を導く
             </h2>
             <p class="text-slate-300 text-sm leading-relaxed">
-                このツールは、あなたがデザインしたい「物・事」についていくつかの問いに答えることで、AI（LLM）から深みのある「ペルソナ詳細定義」と「高品質な画像生成プロンプト」を引き出すための指示書（プロンプト）を組み立てます。まずは「どんな体験をもたらしたいか」から考えてみましょう。
+                このツールは、あなたがデザインしたい「物・事」についていくつかの問いに答えることで、AI（LLM）から深みのある「ペルソナ詳細定義」と「高品質な画像生成プロンプト」を引き出すための指示書（プロンプト）を組み立てます。
             </p>
         </div>
 
@@ -111,8 +111,8 @@
 
                     <div>
                         <label class="block text-sm font-semibold text-slate-700 mb-1">2-2. その変化を「一番切実に求めている（必要としている）」のはどんな人・立場か？</label>
-                        <p class="text-xs text-slate-400 mb-2">例：毎日の雑務に追われて自分の時間が持てず、少しでも心を解放したいと感じている人、新しいことに挑戦したいけど失敗が怖い子どもや初心者、など</p>
-                        <textarea name="targetPersonHint" rows="3" class="w-full rounded-xl border border-slate-300 p-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none" placeholder="この体験が最も刺さる人物像の仮説（年齢や属性にとらわれず、状況や心理から記述）"></textarea>
+                        <p class="text-xs text-slate-400 mb-2">例：毎日の雑務に追われて自分の時間が持てず、少しでも心を解放したいと感じている人、など</p>
+                        <textarea name="targetPersonHint" rows="3" class="w-full rounded-xl border border-slate-300 p-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none" placeholder="この体験が最も刺さる人物像の仮説"></textarea>
                     </div>
                 </div>
             </section>
@@ -126,17 +126,17 @@
 
                 <div class="space-y-6">
                     <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-2">3-1. 利用する人と、お金を払う・決める人は同じですか？</label>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">3-1. 利用する人と、お金を払う・決める人は同じですか？ *</label>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <label class="border rounded-xl p-4 flex items-center space-x-3 cursor-pointer hover:border-indigo-500 transition has-[:checked]:border-indigo-600 has-[:checked]:bg-indigo-50/50">
-                                <input type="radio" name="buyerRelation" value="同一人物（自分で使って自分で決める）" checked class="text-indigo-600 focus:ring-indigo-500">
+                                <input type="radio" name="buyerRelation" value="same" checked class="text-indigo-600 focus:ring-indigo-500" onclick="toggleBuyerSection(false)">
                                 <div>
                                     <span class="font-medium block text-slate-900">同一人物</span>
                                     <span class="text-xs text-slate-500">自分で選んで自分で利用する</span>
                                 </div>
                             </label>
                             <label class="border rounded-xl p-4 flex items-center space-x-3 cursor-pointer hover:border-indigo-500 transition has-[:checked]:border-indigo-600 has-[:checked]:bg-indigo-50/50">
-                                <input type="radio" name="buyerRelation" value="異なる（例：子どもが使い親が買う、従業員が使い会社が導入するなど）" class="text-indigo-600 focus:ring-indigo-500">
+                                <input type="radio" name="buyerRelation" value="different" class="text-indigo-600 focus:ring-indigo-500" onclick="toggleBuyerSection(true)">
                                 <div>
                                     <span class="font-medium block text-slate-900">異なる（分離している）</span>
                                     <span class="text-xs text-slate-500">使用者と決定者/購入者が別</span>
@@ -145,8 +145,28 @@
                         </div>
                     </div>
 
+                    <!-- 購入者が異なる場合のみ表示される詳細セクション -->
+                    <div id="buyerDetailsContainer" class="hidden bg-slate-50 border border-indigo-100 rounded-xl p-5 space-y-4">
+                        <h4 class="text-sm font-bold text-indigo-900 flex items-center gap-1.5">
+                            <i data-lucide="users" class="w-4 h-4"></i>
+                            <span>お金を払う人・決める人（購入者/バイヤー）の仮説</span>
+                        </h4>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">3-2a. 購入者はどのような人ですか？</label>
+                            <input type="text" name="buyerWho" class="w-full rounded-lg border border-slate-300 p-2.5 text-sm bg-white focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="例：子どもの教育熱心な親、職場の決裁権を持つ総務部長、など">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">3-2b. なぜその人はこれにお金を払う（投資する）のですか？（どんな不安や期待があるか）</label>
+                            <input type="text" name="buyerWhy" class="w-full rounded-lg border border-slate-300 p-2.5 text-sm bg-white focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="例：子どもの自主性を育てたい、業務の無駄なコストを削減したい、など">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">3-2c. 「実際に使う人（利用者）」に対して、購入者は何を期待していますか？</label>
+                            <input type="text" name="buyerExpectation" class="w-full rounded-lg border border-slate-300 p-2.5 text-sm bg-white focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="例：楽しく安全に使って成長してほしい、ミスなく効率よく作業をこなしてほしい、など">
+                        </div>
+                    </div>
+
                     <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1">3-2. 日常の中で、その課題に直面する特定のシチュエーション</label>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">3-3. 日常の中で、その課題に直面する特定のシチュエーション</label>
                         <p class="text-xs text-slate-400 mb-2">例：平日の夕方、帰宅してバタバタしているリビングで、など</p>
                         <input type="text" name="useSituation" class="w-full rounded-xl border border-slate-300 p-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none" placeholder="いつ、どこで、どんな文脈でその対象に触れるか">
                     </div>
@@ -163,13 +183,13 @@
                 <div class="space-y-6">
                     <div>
                         <label class="block text-sm font-semibold text-slate-700 mb-1">4-1. 表面の不満の裏にある「本当の気持ち・本音」</label>
-                        <p class="text-xs text-slate-400 mb-2">例：表向きは「時間がない」と言っているが、実は「失敗して恥をかきたくない」「自分のペースで納得いくまでやりたい」という恐れがある、など</p>
+                        <p class="text-xs text-slate-400 mb-2">例：表向きは時間がないと言っているが、実は失敗して恥をかきたくない、など</p>
                         <textarea name="hiddenMind" rows="2" class="w-full rounded-xl border border-slate-300 p-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none" placeholder="本音や隠れたペイン"></textarea>
                     </div>
 
                     <div>
                         <label class="block text-sm font-semibold text-slate-700 mb-1">4-2. その人が大切にしている価値観や「これだけは譲れないマイルール」</label>
-                        <p class="text-xs text-slate-400 mb-2">例：子どもなら「自分の世界観やキャラクターを否定されたくない」、大人なら「洗練されたミニマルなデザインしか置きたくない」、など年齢・立場を問わず</p>
+                        <p class="text-xs text-slate-400 mb-2">例：自分の世界観を否定されたくない、ミニマルなものしか置きたくない、など</p>
                         <input type="text" name="coreValue" class="w-full rounded-xl border border-slate-300 p-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none" placeholder="ゆずれないこだわりや大切にしている基準">
                     </div>
                 </div>
@@ -245,6 +265,16 @@
         // Lucideアイコンの初期化
         lucide.createIcons();
 
+        // 購入者セクションの表示切り替え
+        function toggleBuyerSection(show) {
+            const container = document.getElementById('buyerDetailsContainer');
+            if (show) {
+                container.classList.remove('hidden');
+            } else {
+                container.classList.add('hidden');
+            }
+        }
+
         document.getElementById('generateBtn').addEventListener('click', function() {
             const form = document.getElementById('personaForm');
             if (!form.checkValidity()) {
@@ -255,10 +285,12 @@
             const formData = new FormData(form);
             const data = Object.fromEntries(formData.entries());
 
-            // メタプロンプトの組み立て（体験逆算型・汎用/各LLM対応）
+            const isDifferentBuyer = data.buyerRelation === 'different';
+
+            // メタプロンプトの組み立て
             const generatedPrompt = `# 役割と目的
 あなたは第一線で活躍するUXデザイナー兼リサーチャーです。
-以下の入力情報（ユーザーが「体験のゴール」や「思考の断片」から導き出した仮説）に基づき、血の通った「リアルなペルソナ詳細定義」と「画像生成用の高精度プロンプト」を作成してください。
+以下の入力情報（ユーザーが「体験のゴール」や「思考の断片」から導き出した仮説）に基づき、血の通ったリアルなペルソナ詳細定義と、画像生成用の高精度プロンプトを作成してください。
 
 # 入力された思考データ
 - **対象の種別**: ${data.targetType}
@@ -266,7 +298,10 @@
 - **既存の手段の限界**: ${data.existingPain || "【未記入】一般的な不満から補完してください"}
 - **体験のゴール（感情の変化）**: ${data.emotionalGoal || "【未記入】利用前後で生まれるポジティブな変化を補完してください"}
 - **切実に求めている人物像の仮説**: ${data.targetPersonHint || "【未記入】この体験が最も刺さる人物像を補完してください"}
-- **構造（利用者と購入者）**: ${data.buyerRelation}
+- **構造（使用者と購入者の関係）**: ${isDifferentBuyer ? '利用者と購入者（決定者）は異なる' : '使用者と購入者は同一人物'}
+${isDifferentBuyer ? `  - **購入者(Buyer)像**: ${data.buyerWho || "【未記入】購入者の属性を補完してください"}
+  - **購入理由・投資の動機**: ${data.buyerWhy || "【未記入】購入者がお金を払う理由を補完してください"}
+  - **利用者に期待すること**: ${data.buyerExpectation || "【未記入】利用者にどうなってほしいかを補完してください"}` : ''}
 - **利用シチュエーション**: ${data.useSituation || "【未記入】適切な日常のシーンを補完してください"}
 - **表面の不満の裏にある本音**: ${data.hiddenMind || "【未記入】心理的背景を補完してください"}
 - **大切にしている価値観・譲れないこだわり**: ${data.coreValue || "【未記入】固有のこだわりを補完してください"}
@@ -277,20 +312,31 @@
 以下の構成で出力してください（Markdown形式）。
 
 ## 1. ペルソナ詳細定義
-- **プロフィール像**（年齢、立場、ライフスタイルなど。子どもやシニア、特定の役割など入力された背景に合わせる）
+${isDifferentBuyer ? `
+### ① 実際に使う人（User）のペルソナ
+- **プロフィール像**（年齢、立場、ライフスタイルなど）
+- **日常の文脈と利用シーン**
+- **体験のビフォーアフター**（入力された感情のゴール）
+- **隠れたペイン（本音）と譲れないこだわり**
+
+### ② お金を払う・決める人（Buyer）のペルソナ
+- **プロフィール像**（年齢、立場、予算の権限など）
+- **購入・導入の動機**（なぜお金を払う必要があると感じているか）
+- **利用者に期待していること**（ユーザーにどうなってほしいという願いか）
+` : `
+- **プロフィール像**（年齢、立場、ライフスタイルなど。入力された背景に合わせる）
 - **日常の文脈と利用シーン**（どのような環境でその対象に触れるか）
 - **体験のビフォーアフター**（入力された感情のゴールが、どのように実現されるか）
 - **隠れたペイン（本音）と譲れないこだわり**
-
-*(※「利用者と購入者」が異なる場合は、「利用者(User)のペルソナ」と「購入者/決定者(Buyer)のペルソナ」の2者を対比させて記述してください)*
+`}
 
 ## 2. 画像生成用プロンプト
 - **スタイル**: ${data.imageStyle}
-- **英語プロンプト**（MidjourneyやDALL-E 3、Stable Diffusion等にそのまま使える英語の情景・人物・プロダクト描写のプロンプトをカンマ区切り等で詳細に出力してください）
+- **英語プロンプト**（MidjourneyやDALL-E 3等にそのまま使える英語の情景・人物・プロダクト描写のプロンプト）
 
 # 最後に（対話・ブラッシュアップの促し）
 出力の最後に、必ずユーザーに向けて以下の問いかけを行ってください：
-「以上のペルソナ定義と画像生成プロンプトを作成しました。さらに深掘りしたい点や、年齢層・設定を微調整したい箇所（例：もっと若い年齢にしたい、予算感をこう変えたいなど）があれば教えてください。」`;
+「以上のペルソナ定義と画像生成プロンプトを作成しました。さらに深掘りしたい点や、年齢層・設定を微調整したい箇所（例：もっと若い年齢にしたい、購入者の予算感をこう変えたいなど）があれば教えてください。」`;
 
             // 出力欄にセットして表示
             document.getElementById('promptOutput').value = generatedPrompt;
