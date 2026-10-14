@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UX/Design Persona & Prompt Generator</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col font-sans antialiased">
+
+    <!-- Header -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-brand-600 text-white p-2 rounded-xl shadow-sm">
+                    <i data-lucide="sparkles" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-slate-900 tracking-tight">Persona & Prompt Generator</h1>
+                    <p class="text-xs text-slate-500">デザイン思考・UX設計のためのLLMプロンプト自動生成ツール</p>
+                </div>
+            </div>
+            <div>
+                <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="inline-flex items-center space-x-1 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg transition-colors font-medium">
+                    <i data-lucide="github" class="w-4 h-4"></i>
+                    <span>GitHub</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-4xl mx-auto px-4 py-8 flex-grow w-full">
+        
+        <!-- Intro Card -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-8">
+            <h2 class="text-base font-semibold text-slate-900 mb-2 flex items-center">
+                <i data-lucide="info" class="w-4 h-4 text-brand-600 mr-2"></i>
+                使い方
+            </h2>
+            <p class="text-sm text-slate-600 leading-relaxed">
+                以下の質問にポチポチと答えていくだけで、物・事（プロダクト・サービス）の双方に対応した「詳細なペルソナ（使用者・購入者の分離対応）」および「画像生成用プロンプト」を引き出すための**超高品質なLLM用プロンプト**が自動生成されます。生成されたプロンプトをコピーして、お好きなAI（ChatGPT、Claude、Geminiなど）に貼り付けて実行してください！
+            </p>
+        </div>
+
+        <!-- Form Section -->
+        <form id="generator-form" class="space-y-8">
+
+            <!-- STEP 1: 対象の基本定義 -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                <div class="flex items-center space-x-2 pb-4 mb-4 border-b border-slate-100">
+                    <span class="flex items-center justify-center w-7 h-7 rounded-full bg-brand-100 text-brand-700 text-xs font-bold">1</span>
+                    <h3 class="text-base font-bold text-slate-900">対象（プロダクト・サービス）の基本定義</h3>
+                </div>
+
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">デザインする対象の種類 <span class="text-rose-500">*</span></label>
+                        <div class="grid grid-cols-2 gap-4">
+                            <label class="relative flex items-center p-4 rounded-xl border border-slate-200 cursor-pointer hover:bg-slate-50 transition-all has-[:checked]:border-brand-600 has-[:checked]:bg-brand-50/50 has-[:checked]:ring-1 has-[:checked]:ring-brand-600">
+                                <input type="radio" name="target_type" value="物" class="text-brand-600 focus:ring-brand-500" checked>
+                                <span class="ml-3 text-sm font-medium text-slate-800">📦 物（ハードウェア・プロダクト・日用品等）</span>
+                            </label>
+                            <label class="relative flex items-center p-4 rounded-xl border border-slate-200 cursor-pointer hover:bg-slate-50 transition-all has-[:checked]:border-brand-600 has-[:checked]:bg-brand-50/50 has-[:checked]:ring-1 has-[:checked]:ring-brand-600">
+                                <input type="radio" name="target_type" value="事" class="text-brand-600 focus:ring-brand-500">
+                                <span class="ml-3 text-sm font-medium text-slate-800">💡 事（アプリ・Webサービス・体験・仕組み等）</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="target_name" class="block text-sm font-medium text-slate-700 mb-1">名称・一言概要 <span class="text-rose-500">*</span></label>
+                        <input type="text" id="target_name" placeholder="（例：一人暮らし向けのコンパクト自動調理ポット、または育児中のスキマ時間英語学習アプリ）" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm">
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 2: 利用・購買構造 -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                <div class="flex items-center space-x-2 pb-4 mb-4 border-b border-slate-100">
+                    <span class="flex items-center justify-center w-7 h-7 rounded-full bg-brand-100 text-brand-700 text-xs font-bold">2</span>
+                    <h3 class="text-base font-bold text-slate-900">利用と購買の構造（ユーザーとバイヤー）</h3>
+                </div>
+
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">実際に使う人と、お金を払う（決める）人の関係は？</label>
+                        <div class="space-y-3">
+                            <label class="relative flex items-center p-4 rounded-xl border border-slate-200 cursor-pointer hover:bg-slate-50 transition-all has-[:checked]:border-brand-600 has-[:checked]:bg-brand-50/50 has-[:checked]:ring-1 has-[:checked]:ring-brand-600">
+                                <input type="radio" name="buyer_relation" value="same" class="text-brand-600 focus:ring-brand-500" checked>
+                                <span class="ml-3 text-sm text-slate-800">
+                                    <strong class="font-medium">同一人物</strong>（自分で選んで自分で買う / 一般的なBtoC）
+                                </span>
+                            </label>
+                            <label class="relative flex items-center p-4 rounded-xl border border-slate-200 cursor-pointer hover:bg-slate-50 transition-all has-[:checked]:border-brand-600 has-[:checked]:bg-brand-50/50 has-[:checked]:ring-1 has-[:checked]:ring-brand-600">
+                                <input type="radio" name="buyer_relation" value="different" class="text-brand-600 focus:ring-brand-500">
+                                <span class="ml-3 text-sm text-slate-800">
+                                    <strong class="font-medium">異なる</strong>（例：子供が使うが親が買う、社員が使うが会社が導入する、ペット用品など）
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 3: ユーザーの課題・こだわり・シーン -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                <div class="flex items-center space-x-2 pb-4 mb-4 border-b border-slate-100">
+                    <span class="flex items-center justify-center w-7 h-7 rounded-full bg-brand-100 text-brand-700 text-xs font-bold">3</span>
+                    <h3 class="text-base font-bold text-slate-900">ユーザーの課題・こだわり・利用シーン（選択＋任意記述）</h3>
+                </div>
+
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">ユーザーが普段抱えている「お困りごと・不満」（複数選択可）</label>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                            <label class="flex items-center p-3 rounded-lg border border-slate-200 hover:bg-slate-50 text-sm cursor-pointer">
+                                <input type="checkbox" name="pain" value="時間がない・効率を上げたい（タイパ重視）" class="rounded text-brand-600 focus:ring-brand-500 w-4 h-4">
+                                <span class="ml-2 text-slate-700">時間がない・効率を上げたい（タイパ）</span>
+                            </label>
+                            <label class="flex items-center p-3 rounded-lg border border-slate-200 hover:bg-slate-50 text-sm cursor-pointer">
+                                <input type="checkbox" name="pain" value="操作が難しい・覚えるのが面倒" class="rounded text-brand-600 focus:ring-brand-500 w-4 h-4">
+                                <span class="ml-2 text-slate-700">操作が難しい・覚えるのが面倒</span>
+                            </label>
+                            <label class="flex items-center p-3 rounded-lg border border-slate-200 hover:bg-slate-50 text-sm cursor-pointer">
+                                <input type="checkbox" name="pain" value="コストパフォーマンスや価格に不満がある" class="rounded text-brand-600 focus:ring-brand-500 w-4 h-4">
+                                <span class="ml-2 text-slate-700">コストや価格に不満がある</span>
+                            </label>
+                            <label class="flex items-center p-3 rounded-lg border border-slate-200 hover:bg-slate-50 text-sm cursor-pointer">
+                                <input type="checkbox" name="pain" value="退屈・ワクワクする体験が足りない" class="rounded text-brand-600 focus:ring-brand-500 w-4 h-4">
+                                <span class="ml-2 text-slate-700">退屈・ワクワクする体験が足りない</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">物事を選ぶときの最大の基準（最大2つまで選択）</label>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                            <label class="flex items-center p-3 rounded-lg border border-slate-200 hover:bg-slate-50 text-sm cursor-pointer">
+                                <input type="checkbox" name="criteria" value="価格・コスパ重視" class="rounded text-brand-600 focus:ring-brand-500 w-4 h-4 criteria-checkbox">
+                                <span class="ml-2 text-slate-700">価格・コスパ重視</span>
+                            </label>
+                            <label class="flex items-center p-3 rounded-lg border border-slate-200 hover:bg-slate-50 text-sm cursor-pointer">
+                                <input type="checkbox" name="criteria" value="デザイン・美しさ・手触り重視" class="rounded text-brand-600 focus:ring-brand-500 w-4 h-4 criteria-checkbox">
+                                <span class="ml-2 text-slate-700">デザイン・見た目重視</span>
+                            </label>
+                            <label class="flex items-center p-3 rounded-lg border border-slate-200 hover:bg-slate-50 text-sm cursor-pointer">
+                                <input type="checkbox" name="criteria" value="機能・スペックの高さ重視" class="rounded text-brand-600 focus:ring-brand-500 w-4 h-4 criteria-checkbox">
+                                <span class="ml-2 text-slate-700">機能・スペック重視</span>
+                            </label>
+                            <label class="flex items-center p-3 rounded-lg border border-slate-200 hover:bg-slate-50 text-sm cursor-pointer">
+                                <input type="checkbox" name="criteria" value="使いやすさ・手軽さ重視" class="rounded text-brand-600 focus:ring-brand-500 w-4 h-4 criteria-checkbox">
+                                <span class="ml-2 text-slate-700">使いやすさ・手軽さ重視</span>
+                            </label>
+                            <label class="flex items-center p-3 rounded-lg border border-slate-200 hover:bg-slate-50 text-sm cursor-pointer">
+                                <input type="checkbox" name="criteria" value="ブランドの安心感・信頼性重視" class="rounded text-brand-600 focus:ring-brand-500 w-4 h-4 criteria-checkbox">
+                                <span class="ml-2 text-slate-700">ブランドの安心感重視</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="extra_notes" class="block text-sm font-medium text-slate-700 mb-1">追加の自由記述（任意・未記入OK）</label>
+                        <textarea id="extra_notes" rows="2" placeholder="（例：特に30代共働き夫婦をターゲットにしたい、など自由に書いてください。空欄でもAIが自動補完します）" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 4: 出力チューニング（LLM & スタイル選択） -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                <div class="flex items-center space-x-2 pb-4 mb-4 border-b border-slate-100">
+                    <span class="flex items-center justify-center w-7 h-7 rounded-full bg-brand-100 text-brand-700 text-xs font-bold">4</span>
+                    <h3 class="text-base font-bold text-slate-900">出力のチューニング（AIと画像スタイル）</h3>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">使用するLLM（最適化先）</label>
+                        <select id="llm_choice" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm bg-white">
+                            <option value="general">汎用LLM（ChatGPT / Claude / Gemini 全般）</option>
+                            <option value="claude">Claude（深みのある文章・心理描写に最適）</option>
+                            <option value="chatgpt">ChatGPT / GPT-4o（構造化と画像プロンプト生成に最適）</option>
+                            <option value="gemini">Gemini（バランスの取れた総合出力に最適）</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">画像生成プロンプトのスタイル</label>
+                        <select id="image_style" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm bg-white">
+                            <option value="photorealistic">リアル・実写風（生活感のあるドキュメンタリータッチ）</option>
+                            <option value="3d_render">3Dレンダリング・コンセプトアート風（洗練されたプレゼン風）</option>
+                            <option value="flat_illustration">フラットイラスト・モダンベクター風（Web/アプリ向き）</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Generate Button -->
+            <div class="text-center pt-2">
+                <button type="button" id="generate-btn" class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-2xl shadow-lg shadow-brand-600/20 transition-all text-base">
+                    <i data-lucide="wand-2" class="w-5 h-5 mr-2"></i>
+                    <span>LLM用プロンプトを生成する</span>
+                </button>
+            </div>
+
+        </form>
+
+        <!-- Result Section (Hidden by default) -->
+        <div id="result-container" class="hidden mt-10 space-y-6">
+            <div class="bg-slate-900 text-white rounded-2xl shadow-xl p-6 border border-slate-800">
+                <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-800">
+                    <div class="flex items-center space-x-2">
+                        <i data-lucide="terminal" class="w-5 h-5 text-brand-400"></i>
+                        <h3 class="font-bold text-sm text-slate-200">生成されたプロンプト（コピーしてLLMに貼り付けてください）</h3>
+                    </div>
+                    <button id="copy-btn" class="inline-flex items-center space-x-1.5 px-3.5 py-1.5 bg-brand-600 hover:bg-brand-500 text-white text-xs font-semibold rounded-lg transition-colors">
+                        <i data-lucide="copy" class="w-4 h-4"></i>
+                        <span id="copy-text">コピーする</span>
+                    </button>
+                </div>
+                
+                <div class="relative">
+                    <pre id="prompt-output" class="bg-slate-950 text-slate-300 p-4 rounded-xl text-xs sm:text-sm font-mono overflow-x-auto whitespace-pre-wrap leading-relaxed max-h-96 select-all"></pre>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-6 mt-12 text-center text-xs text-slate-500">
+        <p>Persona & Design Prompt Generator for GitHub Pages. Built for Creators & UX Designers.</p>
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Limit criteria checkboxes to maximum 2
+        const criteriaCheckboxes = document.querySelectorAll('.criteria-checkbox');
+        criteriaCheckboxes.forEach(cb => {
+            cb.addEventListener('change', () => {
+                const checkedCount = document.querySelectorAll('.criteria-checkbox:checked').length;
+                if (checkedCount > 2) {
+                    cb.checked = false;
+                    alert('判断基準は最大2つまで選択できます。');
+                }
+            });
+        });
+
+        // Generate Prompt Logic
+        document.getElementById('generate-btn').addEventListener('click', () => {
+            const targetName = document.getElementById('target_name').value.trim();
+            if (!targetName) {
+                alert('対象の「名称・一言概要」を入力してください。');
+                document.getElementById('target_name').focus();
+                return;
+            }
+
+            const targetType = document.querySelector('input[name="target_type"]:checked').value;
+            const buyerRelation = document.querySelector('input[name="buyer_relation"]:checked').value;
+            
+            // Gather pains
+            const pains = Array.from(document.querySelectorAll('input[name="pain"]:checked')).map(el => el.value);
+            
+            // Gather criteria
+            const criteria = Array.from(document.querySelectorAll('.criteria-checkbox:checked')).map(el => el.value);
+
+            const extraNotes = document.getElementById('extra_notes').value.trim();
+            const llmChoice = document.getElementById('llm_choice').value;
+            const imageStyle = document.getElementById('image_style').value;
+
+            // Build Prompt Text
+            let promptText = `あなたは世界トップクラスのUXデザイナー兼リサーチャー、およびデザインディレクターです。
+以下の入力情報に基づき、実在感のある「ペルソナ詳細定義」および「画像生成用の高精度プロンプト（英語）」を構築してください。
+
+---
+### 【入力情報】
+1. 対象の種別: ${targetType === '物' ? '物（ハードウェア・プロダクト等）' : '事（サービス・アプリ・体験等）'}
+2. 名称・概要: ${targetName}
+3. 利用と購買の構造: ${buyerRelation === 'same' ? '使用者と購入者は同一人物（自分で選んで自分で買う）' : '使用者と購入者は別々（例：使う人と決裁者・買う人が異なる構造）'}
+4. ユーザーの主な課題/ペイン: ${pains.length > 0 ? pains.join(' / ') : '未記入（市場特性や常識からAIが自動推測・補完してください）'}
+5. 選択の判断基準: ${criteria.length > 0 ? criteria.join(' / ') : '未記入（AIが妥当な基準を補完）'}
+6. 追加の補足情報: ${extraNotes ? extraNotes : '特になし（AIが文脈に沿ってリアリティを補完）'}
+7. 画像生成スタイル: ${imageStyle}
+---
+
+### 【LLMへの指示・フォールバック規則】
+- 未記入の項目がある場合や簡略な記述の箇所は、その対象の業界標準や常識に照らし合わせ、AIが最も自然で説得力のあるペルソナ像を自律的に推測・補完してください。
+- 文脈にリアリティを持たせ、表面的な属性だけでなく「行動原理」「心理的ハードル」「日常の具体的なストーリー」まで深く描き出してください。
+
+### 【出力フォーマット】
+以下の構成で出力してください。
+
+1. **使用者（User）のペルソナ詳細**
+   - 基本プロフィール（名前、年齢、職業、家族構成、ライフスタイル）
+   - 日常のストーリーと一日の流れ
+   - 抱えている切実な課題（ペイン）と求めている価値（ゲイン）
+   - 対象を選ぶ際の心理的トリガー
+
+${buyerRelation === 'different' ? `2. **購入者／決定者（Buyer）のペルソナ詳細**
+   - 基本プロフィール（使用者との関係性、決裁権の背景）
+   - なぜこの対象にお金を払うのか（投資対効果・安心感・メンツ・義務などの動機）
+   - 購買におけるハードル（予算の壁、安全性や信頼性の懸念）` : ''}
+
+3. **画像生成用プロンプト（Image Generation Prompt）**
+   - MidjourneyやDALL-E 3等にそのまま入力できる英語のプロンプトを1パターン作成してください。
+   - スタイル: ${imageStyle}
+   - 対象（${targetName}）が自然に溶け込んでいる生き生きとしたシーン、ペルソナの表情や背景環境を具体的に描写してください。（例: 主題, 背景, ライティング, カメラアングル, 雰囲気を含む英語記述）
+
+---
+### 【最後にユーザーへの問いかけ】
+出力の最後には、必ず以下の問いかけをユーザーに行ってください：
+「以上のペルソナと画像生成プロンプトを作成しました。さらに深掘りしたい点や、年齢層・トーンを調整したい箇所があれば教えてください！」
+`;
+
+            if (llmChoice === 'claude') {
+                promptText = `[Claude最適化モード]\n` + promptText;
+            } else if (llmChoice === 'chatgpt') {
+                promptText = `[ChatGPT最適化モード: マークダウン構造を厳密に守って出力してください]\n` + promptText;
+            } else if (llmChoice === 'gemini') {
+                promptText = `[Gemini最適化モード: 全体的な一貫性と文脈の深さを重視して出力してください]\n` + promptText;
+            }
+
+            // Display result
+            const outputElement = document.getElementById('prompt-output');
+            outputElement.textContent = promptText;
+            
+            const resultContainer = document.getElementById('result-container');
+            resultContainer.classList.remove('hidden');
+            resultContainer.scrollIntoView({ behavior: 'smooth' });
+        });
+
+        // Copy button logic
+        document.getElementById('copy-btn').addEventListener('click', () => {
+            const promptText = document.getElementById('prompt-output').textContent;
+            navigator.clipboard.writeText(promptText).then(() => {
+                const copyText = document.getElementById('copy-text');
+                copyText.textContent = 'コピー完了！';
+                setTimeout(() => {
+                    copyText.textContent = 'コピーする';
+                }, 2000);
+            }).catch(err => {
+                alert('コピーに失敗しました。手動でコピーしてください。');
+            });
+        });
+    </script>
+</body>
+</html>
